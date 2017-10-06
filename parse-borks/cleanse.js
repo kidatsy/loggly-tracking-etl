@@ -74,12 +74,8 @@ function parseRow(rawRow) {
   return regularThings;
 }
 
-function flattenHeader(headerArray) {
-  return headerArray.join(',') + '\r';
-}
-
-function flattenRow(rowArray) {
-  return _.map(rowArray, function (el) {return '"' + el + '"';}).join(',') + '\r';
+function flattenLine(lineArray) {
+  return _.map(lineArray, function (el) {return '"' + el + '"';}).join(',') + '\r';
 }
 
 
@@ -94,11 +90,11 @@ for (var i = 1; i <= fileCount; i++) {
   }
 
   var header = parseHeader(fileLines[0]);
-  fs.appendFileSync(output, flattenHeader(header));
+  fs.appendFileSync(output, flattenLine(header));
 
   for (var j = 1; j < fileLines.length; j++) {
     var row = parseRow(fileLines[j]);
-    fs.appendFileSync(output, flattenRow(row));
+    fs.appendFileSync(output, flattenLine(row));
   }
   console.log('File ' + i + ' is cleaned up!');
 }
