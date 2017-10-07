@@ -1,2 +1,15 @@
+# General
 *.csv
 .DS_Store
+
+# Node
+node_modules
+logs
+*.log
+npm-debug.log*
+
+# Clover ETL
+.metadata
+RealWorldExamples
+WebSiteExamples
+RemoteSystemsTempFiles
