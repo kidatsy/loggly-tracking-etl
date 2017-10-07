@@ -2,14 +2,20 @@ var fs = require('fs');
 var _ = require('lodash');
 
 var tempJsonDelimiter = '&&&&&&';
-var fileCount = 23;
+var fileCount = 26;
 
 function parseHeader(rawHeader) {
   return rawHeader.replace(/"| /g, '').split(',');
 } 
 
 function parseJsonRow(chunk, depthString) {
-  var jsonChunks = chunk.replace(/"/g, '').split(':');
+  var string = chunk.replace(/"/g, '');
+  if (/[0-9]+:/.test(string)) {
+    var chapterString = string.match(/(Chapter [0-9]+)/)[0];
+    string = string.replace(/(?:[0-9]+):/, '-').replace('Chapter', chapterString);
+    if (!/:/.test(string)) return false;
+  }
+  var jsonChunks = string.replace(/(?!Chapter)[0-9]:/g, '-').split(':');
   var length = jsonChunks.length;
   var maxId = length - 1;
   var key;
@@ -64,12 +70,14 @@ function parseRow(rawRow) {
       }
 
       var parsed = parseJsonRow(chunk, depthString);
+      if (!parsed) continue;
       depthString = parsed['depthString'];
       jsonThings[parsed['key']] = parsed['value'];
     } else {
       regularThings.push(chunk.replace(/"|\\|'/g, '').replace(/\[/g, '[""').replace(/\]/g,'""]'));
     }
   }
+
   regularThings[jsonIndex] = JSON.stringify(reinflateJsonObject(jsonThings)).replace(/"/g,'""');
   return regularThings;
 }
